@@ -33,6 +33,23 @@
   import Container from "../../components/Container";
   export default {
     name: "Nslookup",
+    info:{
+      label: "nslookup",
+      logo: "",
+      desc: "",
+      cmds:[
+        {
+          "type": "regex",
+          "label": "nslookup",
+          "match": "/^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$/"
+        },
+        {
+          "type": "regex",
+          "label": "nslookup",
+          "match": "/(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\\.)+[a-zA-Z]{2,63}\\.?$)/"
+        }
+      ]
+    },
     components: {Container},
     data() {
       return {

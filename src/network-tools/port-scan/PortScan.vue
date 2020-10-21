@@ -44,6 +44,18 @@
   import Container from "../../components/Container";
   export default {
     name: "PortScan",
+    info:{
+      label: "端口扫描",
+      logo: "",
+      desc: "",
+      cmds:[
+        {
+          "type": "regex",
+          "label": "端口扫描",
+          "match": "/^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$/"
+        }
+      ]
+    },
     components: {Container},
     data() {
       return {

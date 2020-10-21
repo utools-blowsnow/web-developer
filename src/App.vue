@@ -25,7 +25,13 @@
 <script>
 // 利用require.context自动引用
 const modules = require('@/lib/tools').default;
-
+const items = [];
+for(let key of Object.keys(modules)){
+  let module = modules[key];
+  items.push({...module.info, code: key})
+}
+// 动态设置
+console.log(items);
 export default {
   name: 'app',
   data() {
@@ -33,19 +39,7 @@ export default {
       code: '',
       payload: null,
 
-      items: [
-        {label: "JSON格式化", code: "JsonFormat",logo: "https://static.easyicon.net/preview/120/1205621.gif"},
-        {label: "代码美化", code: "CodeFormat", logo: "https://static.easyicon.net/preview/126/1266712.gif"},
-        {label: "代码压缩", code: "CodeCompress", logo: "https://static.easyicon.net/preview/126/1266712.gif"},
-        {label: "简易postman", code: "PostMan", logo: "https://static.easyicon.net/preview/126/1261969.gif"},
-        {label: "中文分词", code: "WordSplit"},
-        {label: "IP查询", code: "IpQuery"},
-        {label: "端口扫描", code: "PortScan"},
-        {label: "局域网扫描", code: "LocalScan"},
-        {label: "路由跟踪", code: "traceroute"},
-        {label: "nslookup", code: "nslookup"},
-        {label: "备案查询", code: "icp"},
-      ],
+      items: items,
       modules:{},
     }
   },

@@ -86,6 +86,11 @@
 
   export default {
     name: "PostMan",
+    info:{
+      label: "简易postman",
+      logo: "https://static.easyicon.net/preview/126/1261969.gif",
+      desc: ""
+    },
     data() {
       return {
         urlContent: '',

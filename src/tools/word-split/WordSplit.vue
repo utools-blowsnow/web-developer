@@ -42,6 +42,17 @@
   import draggable from 'vuedraggable'
   export default {
     name: "WordSplit",
+    info:{
+      label: "中文分词",
+      logo: "",
+      desc: "",
+      cmds:[
+        {
+          "type": "over",
+          "label": "分词匹配"
+        }
+      ]
+    },
     data() {
       return {
         results: [],

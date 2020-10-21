@@ -48,6 +48,11 @@
 <script type="text/ecmascript-6">
   export default {
     name: "CodeFormat",
+    info:{
+      label: "代码美化",
+      logo: "https://static.easyicon.net/preview/126/1266712.gif",
+      desc: "",
+    },
     data() {
       return {
         selectedType: 'Javascript',

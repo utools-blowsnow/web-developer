@@ -52,6 +52,11 @@
   let editor = {};
   export default {
     name: "CodeCompress",
+    info:{
+      label: "代码压缩",
+      logo: "https://static.easyicon.net/preview/126/1266712.gif",
+      desc: ""
+    },
     data() {
       return {
         selectedType: 'Javascript',

@@ -43,6 +43,18 @@
 
   export default {
     name: "IpQuery",
+    info:{
+      label: "IP查询",
+      logo: "",
+      desc: "",
+      cmds:[
+        {
+          "type": "regex",
+          "label": "ip查询",
+          "match": "/^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$/"
+        }
+      ]
+    },
     components: {Container},
     data() {
       return {

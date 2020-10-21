@@ -49,6 +49,23 @@
   import Container from "../../components/Container";
   export default {
     name: "Traceroute",
+    info:{
+      label: "路由跟踪",
+      logo: "",
+      desc: "",
+      cmds:[
+        {
+          "type": "regex",
+          "label": "路由跟踪",
+          "match": "/^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$/"
+        },
+        {
+          "type": "regex",
+          "label": "路由跟踪",
+          "match": "/(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\\.)+[a-zA-Z]{2,63}\\.?$)/"
+        }
+      ]
+    },
     components: {Container},
     data() {
       return {

@@ -67,6 +67,11 @@
 
   export default {
     name: "JsonFormat",
+    info:{
+      label: "JSON格式化",
+      logo: "https://static.easyicon.net/preview/120/1205621.gif",
+      desc: "",
+    },
     data() {
       return {
         defaultResultTpl: '<div class="x-placeholder"><img src="@/tools/json-format/json-demo.jpg" alt="json-placeholder"></div>',
