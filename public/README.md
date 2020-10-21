@@ -22,7 +22,7 @@
 - [ ] Crontab
 - [ ] 颜色转换
 
-# 功能来源
+# 部分功能来源
 https://github.com/zxlie/FeHelper
 
 # 开源

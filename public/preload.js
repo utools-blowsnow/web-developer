@@ -1,5 +1,5 @@
-const { ipcRenderer, remote, clipboard, shell } = require('electron')
-const { dialog } = remote
+const { ipcRenderer, remote, clipboard, shell,dialog } = require('electron')
+// const { dialog } = remote
 const fs = require('fs')
 const path = require('path')
 const process = require('process');
@@ -61,34 +61,31 @@ window.utils = {
   }
 }
 
+window.dbs = function(name,value=undefined){
+    let obj = utools.db.get(name);
+    if (value !== undefined){
+        let putdata = {
+            _id: name,
+            data: value,
+        }
+        if (obj && obj._rev){
+            putdata._rev = obj._rev;
+        }
+        utools.db.put(putdata)
+        return;
+    }
+    if (obj == null) return null;
+    return obj.data;
+}
 window.db = {
 	set:(name,data)=>{
-		var myName = dbname+"_"+name;
-		utools.db.remove(myName)
-		utools.db.put({
-			_id: myName,
-			data: data
-		})
+        window.dbs(name,data)
 	},
 	get:(name)=>{
-		var myName = dbname+"_"+name;
-		var datas = utools.db.get(myName);
-		console.log("window.db.get", datas);
-		if (datas === null || datas===undefined){
-			datas = {data: null};
-		}
-		return datas.data;
+		return window.dbs(name);
 	},
 	push:(name,data)=>{
-		var myName = dbname+"_"+name;
-		var datas = window.db.get(name);
-		datas.push(data);
-		utools.db.remove(myName)
-		utools.db.put({
-			_id: myName,
-			data: datas
-		})
-		console.log("window.db.put", datas);
+        window.dbs(name,data);
 	}
 }
 
@@ -134,23 +131,9 @@ window.utils.scan = (host, start=1, end=2000, timeout = 3000, callback=()=>{},ca
 const command  = require('./command/index.js');
 const Traceroute = command.tracert;
 const Ping = command.ping;
-console.log(Traceroute);
 window.utils.tracert = new Traceroute();
 window.utils.ping = new Ping();
 window.utils.nslookup = new (command.nslookup)();
+window.command = command;
 
 
-window.dbs = function(name,value=undefined){
-    let obj = utools.db.get(name);
-    if (value !== undefined){
-        let putdata = {
-            _id: name,
-            data: value,
-        }
-        if (obj._rev){
-            putdata._rev = obj._rev;
-        }
-        return;
-    }
-    return obj.data;
-}

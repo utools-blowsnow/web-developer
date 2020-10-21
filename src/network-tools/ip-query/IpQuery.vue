@@ -49,7 +49,7 @@
         api: "ipip",
         apiOptions: [
           {label: "ipip",value: "ipip"},
-          {label: "淘宝IP",value: "taobao"},
+          // {label: "淘宝IP",value: "taobao"},
           {label: "百度地图",value: "baidu",set:[
               {label: "百度ak",value: "key"}
           ],key: "Gwb8qTDLXEYRQeeeFoSeBBvtL4CjG0oL"},
@@ -76,29 +76,21 @@
       }
     },
     mounted(){
-      //this.loadScriptString("//api.map.baidu.com/api?ak=egwfleDw6rbXLXTuXtAfd3ZTG2eB7mhS&type=lite&v=1.0");
-      // this.setValue('182.85.215.46');
-      if (window.db.get("ip_query_api")){
-        this.api = window.db.get("ip_query_api");
+      console.log(window.dbs('ip_query_type'));
+      if (window.dbs('ip_query_type')){
+
+        this.api = window.dbs('ip_query_type')||"ipip";
       }
+      //默认获取本机外网ip
+      setTimeout(()=>{
+        if(!this.lastText){
+          this.localIp();
+        }
+      },300)
     },
     methods: {
-      loadScriptString(src) {
-        var head = document.getElementsByTagName('head')[0];
-        var script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = src;
-        head.appendChild(script);
-      },
-      createMap(){
-        var map = new BMap.Map("mapContainer");            // 创建Map实例
-        var point = new BMap.Point(116.404, 39.915); // 创建点坐标
-        map.centerAndZoom(point,15);
-        map.enableScrollWheelZoom();                 //启用滚轮放大缩小
-      },
-
       changeApiHandler(){
-        window.db.set("ip_query_api",this.api);
+        window.dbs('ip_query_type',this.api);
         this.changeApi(this.lastText);
       },
       setValue(text){
@@ -108,6 +100,8 @@
       changeApi(){
         this.results = [];
         let text = this.lastText;
+        eval("this."+ this.api + "Api('"+text+"')");
+        /*console.log(this);
         switch (this.api) {
           case "baidu":
             this.baiduApi(text);
@@ -124,11 +118,18 @@
           case "ipip":
             this.ipipApi(text);
             break;
-        }
+        }*/
       },
 
 
+      localIp(){
+        var that = this;
 
+        // http://ip.360.cn/IPShare/info
+        $.get("https://www.ip.cn/api/index?ip=&type=0",res=>{
+          that.setValue(res.ip);
+        },"JSON")
+      },
 
       //百度
       baiduApi(ip){
@@ -162,7 +163,7 @@
         },"JSON")
       },
       //http://ip-api.com/json/182.85.215.46
-      ipApi(ip){
+      ipapiApi(ip){
         $.get("http://ip-api.com/json/" + ip,res=>{
           this.results = [
             { name: "当前IP", value: ip },
