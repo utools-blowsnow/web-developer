@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/main.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/vue.js"></script>
+	<script src="js/main.js"></script>
+	<script src="js/upload.js"></script>
+
+</head>
+<body>
+    <div id="app">
+		<!--上传图标-->
+		<form class="form-inline" id="uploadForm">
+			<div class="div1">
+				<div class="div2">
+					<div class="upload-logo" ></div>
+				</div>
+				<input id="file" type="file" class="file_input" @change="uploadFileHandler">
+			</div>
+			<input type="hidden" name="action" value="upload">
+			<!--源选择  类型选择-->
+			<div class="form-group">
+				<select class="form-control" v-model="source">
+					<option value="tmplink">tmp.link</option>
+					<option value="airportal">airportal</option>
+					<option value="box">box</option>
+					<option value="">更多等待后期添加</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label class="radio-inline" title="有效期24小时，24小时之后将失效">
+					<input type="radio" name="model" value="0" v-model.number="model">临时模式
+				</label>
+				<label class="radio-inline" title="有效期72小时，当分享的文件在有效期内有人下载时，自动刷新有效期，有效期结束后失效。">
+					<input type="radio" name="model" value="1" checked v-model.number="model">热力链模式
+				</label>
+			</div>
+			<div class="form-group" style="float:right;">
+				tip: 灰色 可能是已失效了,点击复制访问地址
+			</div>
+		</form>
+		<div style="text-align: center;" >
+			<span class="tip" style="display: none;">正在上传</span>
+			<div v-show="uploading">
+				上传进度：<progress></progress><br/>  
+				<p id="progress">{{progress}}</p>  
+			</div>
+		</div>
+        <div class="upload-box" v-for="(data,index) in uploadDatas" :class="getExpressClass(data.fileExpressTime)" :key="index">
+            <p>{{data.fileName}}&nbsp;</p>
+            <p>{{data.filePwd}}&nbsp;</p>
+            <p>{{data.fileUploadTime}}&nbsp;</p>
+			<p>{{data.fileExpressTime}}&nbsp;</p>
+			<div class="qrcode">
+				<img :src="'https://api.wuzuhua.cn/qc/?text='+data.fileUrl" title="复制" @click="copyUrl(data.fileUrl)">
+			</div>
+        </div>
+    </div>
+    <script>
+    const vm = new Vue({
+        el: '#app',
+        data: {
+			source: "tmplink",
+			model: 1,
+           uploadDatas: [],
+		   uploading: false,
+		   progress: ""
+        },
+        methods: {
+            loadUploadDatas(){
+                this.uploadDatas = window.db.get("uploadData").reverse();
+            },
+            copyUrl(data){
+                window.utils.clipboard.writeText(data);
+            },
+			uploadFileHandler(){
+				this.uploadFile($("#file")[0].files[0]);
+			},
+			progressHandling(e){
+				if (e.lengthComputable) {  
+					$('progress').attr({value : e.loaded, max : e.total}); //更新数据到进度条  
+					var percent = e.loaded/e.total*100;
+					var mb = e.total / 1024 / 1024;
+					var loadMb = e.loaded / 1024 / 1024;
+					this.progress = loadMb.toFixed(2) + "/" + mb.toFixed(2)+" mb. " + percent.toFixed(2) + "%";  
+				} 
+			},
+			uploadFile(file=null){
+				if (this.uploading) {
+					return false;
+				}
+				var apiObj = this.getApiObj;
+				console.log("apiObj", apiObj);
+				this.uploading = true;
+				var formData = new FormData($('#uploadForm')[0]);
+				formData.append("file", file); //传给后台的file的key值是可以自己定义的
+				console.log(file,formData);
+				$.ajax({
+					url: apiObj.url,
+					type: 'POST',
+					cache: false,
+					data: formData,
+					processData: false,
+					contentType: false,
+					dataType: "json",
+					beforeSend: ()=>{
+						
+					},
+					xhr: ()=>{ //获取ajaxSettings中的xhr对象，为它的upload属性绑定progress事件的处理函数  
+						myXhr = $.ajaxSettings.xhr();  
+						if(myXhr.upload){ //检查upload属性是否存在  
+						//绑定progress事件的回调函数  
+							myXhr.upload.addEventListener('progress',this.progressHandling, false);   
+						}  
+						return myXhr; //xhr对象返回给jQuery使用  
+					},  
+					success: (data)=>{
+						data.name = file.name;
+						console.log("uploadSuccess1", data);
+						let uploadData = apiObj.jx(data,this.model);
+						console.log("uploadSuccess2", uploadData);
+						if(uploadData.error!=undefined){
+							$(".tip").text(uploadData.error);
+							return 
+						}
+						
+						window.db.push("uploadData",uploadData);
+						this.loadUploadDatas();
+						$(".tip").hide();
+						this.uploading = false;
+					},
+					error:()=>{
+						$(".tip").text("上传失败");
+						this.uploading = false;
+					}
+				});
+			},
+			init(){
+				this.source = window.db.get("source");
+				if (this.source == null || this.source == "") {
+					this.source = "tmplink";
+				}
+			}
+        },
+        created() {
+            setTimeout(() => {
+                this.loadUploadDatas();
+			}, 500); 
+			
+		},
+		watch: {
+			source(val){
+				window.db.set("source", val);
+				console.log("修改源", window.db.get("source"));
+			}
+		},
+		computed: {
+			getApiObj: function (){
+				if (this.source == "tmplink") {
+					return tmpLink;
+				}
+				if (this.source == "airportal") {
+					return airportal;
+				}
+				if (this.source == "box") {
+					return box;
+				}
+			},
+			getExpressClass: function (express) {
+				return function(express) {
+					if(express==null || (new Date(express)).getTime() > (new Date()).getTime()){
+						return 'active';
+					}
+					return 'out';
+				}
+			}
+		},
+    })
+
+
+    
+    </script>
+</body>
+</html>
