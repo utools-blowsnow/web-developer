@@ -47,11 +47,12 @@
       logo: "",
       desc: "",
       cmds:[
+        "icp","域名",
         {
           "type": "regex",
           "label": "备案查询",
           "match": "/(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\\.)+[a-zA-Z]{2,63}\\.?$)/"
-        }
+        },
       ]
     },
     components: {Container},
@@ -92,11 +93,20 @@
         this.lastText = text;
         this.changeApi();
       },
-      changeApi(){
+      async changeApi(){
         this.results = [];
         let text = this.lastText;
 
-        this[this.api + 'Api'](text);
+        await this[this.api + 'Api'](text);
+
+        // 其他信息查询
+        // QQ域名拦截查询
+        let res = await this.request("https://common.onlinfei.com/api/domainCheck/qq?url=" + text);
+        this.results.push({'name': 'QQ域名拦截' , 'value': res.data.info});
+
+        // 微信域名拦截查询
+        res = await this.request("https://common.onlinfei.com/api/domainCheck/weiXin?url=" + text);
+        this.results.push({'name': '微信域名拦截' , 'value': res.data.info});
       },
 
       async chinazApi(domain){
@@ -113,7 +123,11 @@
 
         pattern = /以下信息更新时间：(.*?)</
         let matches = content.match(pattern);
-        this.results.push({'name': '数据更新时间' , 'value': matches[1]});
+        if (matches && matches.length){
+          this.results.push({'name': '数据更新时间' , 'value': matches[1]});
+        }else{
+          this.results.push({'name': '查询提示' , 'value': '域名备案信息查询失败/未备案'});
+        }
       },
 
 

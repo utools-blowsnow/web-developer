@@ -1,6 +1,7 @@
 {
   "pluginName": "Web开发者助手",
   "description": "Web开发者助手",
+  "homepage": "https://github.com/utools-blowsnow/web-developer",
   "author": "blowsnow",
   "main": "index.html",
   "preload": "preload.js",

@@ -129,8 +129,13 @@ export default {
       let res = await this.request("https://www.whois.com/whois/" + value);
       let pattern = /<pre[\s\S]*?>([\s\S]*?)<\/pre>/
       let matches = res.match(pattern);
-      let content = matches[1];
-      content = content.replace(/src="(.*?)"/g, "src=\"https://www.whois.com/$1\"");
+      let content = '';
+      if (matches && matches.length){
+        content = matches[1];
+        content = content.replace(/src="(.*?)"/g, "src=\"https://www.whois.com/$1\"");
+      }else{
+        content = '查询失败';
+      }
       this.results = content;
     },
 
