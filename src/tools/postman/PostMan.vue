@@ -89,7 +89,10 @@
     info:{
       label: "简易postman",
       logo: "https://static.easyicon.net/preview/126/1261969.gif",
-      desc: ""
+      desc: "",
+      cmds:[
+        "postman"
+      ]
     },
     data() {
       return {

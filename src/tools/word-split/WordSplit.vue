@@ -59,7 +59,7 @@
         api: "sogou",
         apiOptions: [
           {label: "搜狗",value: "sogou"},
-          {label: "jsonin",value: "jsonin"},
+          // {label: "jsonin",value: "jsonin"},
           {label: "pullword",value: "pullword"},
         ],
 
@@ -95,58 +95,59 @@
         //http://www.sogou.com/labs/webservice/sogou_word_seg.php
         //
         this.lastText = text;
+
+        eval("this."+ this.api + "Api('"+text+"')");
         // text = encodeURI(text);
-        switch (this.api) {
-          case "sogou":
-            this.sogouApi(text);
-            break;
-          case "pullword":
-            this.pullwordApi(text);
-            break;
-          case "jsonin":
-            this.jsoninApi(text);
-            break;
-        }
+        // switch (this.api) {
+        //   case "sogou":
+        //     this.sogouApi(text);
+        //     break;
+        //   case "pullword":
+        //     this.pullwordApi(text);
+        //     break;
+        //   case "jsonin":
+        //     this.jsoninApi(text);
+        //     break;
+        // }
       },
-      pullwordApi(text){
-        $.get("http://api.pullword.com/get.php?source="+text+"&param1=0&param2=1&json=1",res=>{
-          this.results = [];
-          res.forEach(data=>{
-            this.results.push({
-              word: data.t,
-              speech: null,
-              checked: false
-            })
+      async pullwordApi(text){
+        let res = await this.request("http://api.pullword.com/get.php?source="+text+"&param1=0&param2=1&json=1");
+        this.results = [];
+        res.forEach(data=>{
+          this.results.push({
+            word: data.t,
+            speech: null,
+            checked: false
           })
-        },"JSON")
+        })
       },
-      sogouApi(text){
-        $.post("http://www.sogou.com/labs/webservice/sogou_word_seg.php",{
+      async sogouApi(text){
+        let res = await this.request("http://www.sogou.com/labs/webservice/sogou_word_seg.php",{
           q: text,
           fmt: "js"
-        },res=>{
-          this.results = [];
-          res.result.forEach(data=>{
-            this.results.push({
-              word: data[0],
-              speech: data[1],
-              checked: false
-            })
+        });
+        this.results = [];
+        res.result.forEach(data=>{
+          this.results.push({
+            word: data[0],
+            speech: data[1],
+            checked: false
           })
-        },"JSON")
+        })
       },
-      jsoninApi(text){
-        $.post("https://jsonin.com/fenci.php?msg="+text+"&type=cixing",res=>{
-          this.results = [];
-          res.forEach(data=>{
-            this.results.push({
-              word: data.word,
-              speech: data.tag,
-              checked: false
-            })
+      async jsoninApi(text){
+        let res = await this.request("https://jsonin.com/fenci.php?msg="+text+"&type=cixing")
+        this.results = [];
+        res.forEach(data=>{
+          this.results.push({
+            word: data.word,
+            speech: data.tag,
+            checked: false
           })
-        },"JSON")
+        })
       },
+
+
       copy(){
         let text = this.getSelectText();
         window.copy(text);

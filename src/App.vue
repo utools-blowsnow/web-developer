@@ -30,7 +30,6 @@ for(let key of Object.keys(modules)){
   let module = modules[key];
   items.push({...module.info, code: key})
 }
-// 动态设置
 console.log(items);
 export default {
   name: 'app',
@@ -45,37 +44,34 @@ export default {
   },
   components: modules,
   created() {
-    utools.onPluginEnter(({code, type, payload}) => {
-      console.log(code, type, payload);
+    window.plugin_enter = false;
+    utools.onPluginReady(() => {
+      for(let item of items){
+        if (item.cmds === undefined) item.cmds = [];
+        let feature = {
+          "code": item.code,
+          "explain": item.label,
+          "icon": item.logo||'',
+          "cmds": [item.label,...item.cmds]
+        };
+        utools.setFeature(feature)
+      }
+    })
+    utools.onPluginEnter((params) => {
+      window.plugin_enter = params;
+      const {code, type, payload} = params;
+      console.log(params);
       if (code === "open") return;
       this.code = code;
 
-      // utools.setSubInput(({text}) => {
-      //   this.$refs.node.setValue(text,type);
-      // }, '输入');
       if (type === "text") return;
-      // utools.setSubInputValue(payload);
+
+      // 匹配的才进  regex
 
       this.payload = payload;
       this.$nextTick(() => {
         let type = null;
-        if (code === "code_format") {
-          if (payload.match(/html|div/i)) {
-            type = "HTML";
-          } else if (payload.match(/var|let|function|document|window/i)) {
-            type = "Javascript";
-          } else if (payload.match(/\.[\s\S]*{[\s\S]*}/i)) {
-            type = "CSS";
-          } else if (payload.match(/<\?xml/i)) {
-            type = "XML";
-          } else if (payload.match(/select|update|delete|replcace\s*into|create\s*table/i)) {
-            type = "SQL";
-          }
-        }
-
         this.$refs.node.setValue(payload, type);
-
-
       })
     })
 
@@ -83,6 +79,7 @@ export default {
   methods: {
     callbackReturn() {
       this.code = '';
+      window.plugin_enter = false;
     },
     openTools(item) {
       this.code = item.code;

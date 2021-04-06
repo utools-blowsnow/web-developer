@@ -61,10 +61,10 @@
       return {
         contents: [],
         startPort: 1,
-        endPort: 2000,
-        timeout: 2000,
+        endPort: 10000,
+        timeout: 300,
 
-        ip: null,
+        ip: '127.0.0.1',
         // 0 就绪 1开始ing 2结束
         status: 0,
 

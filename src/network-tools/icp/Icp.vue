@@ -27,6 +27,9 @@
           prop="value"
           label="信息"
           min-width="380">
+          <template slot-scope="scope">
+            <div v-html="scope.row.value"></div>
+          </template>
         </el-table-column>
       </el-table>
       <div id="mapContainer"></div>
@@ -54,9 +57,9 @@
     components: {Container},
     data() {
       return {
-        api: "onlinfei",
+        api: "chinaz",
         apiOptions: [
-          {label: "onlinfei",value: "onlinfei"}
+          {label: "chinaz",value: "chinaz"}
         ],
         isMap: false,
 
@@ -92,34 +95,44 @@
       changeApi(){
         this.results = [];
         let text = this.lastText;
-        switch (this.api) {
-          case "onlinfei":
-            this.onlinfeiApi(text);
-            break;
+
+        this[this.api + 'Api'](text);
+      },
+
+      async chinazApi(domain){
+        let res = await this.request("https://icp.chinaz.com/" + domain);
+        let content = res;
+        // <li[\s\S]*?>[\s\S]*?<span>([\s\S]*?)<\/span>[\s\S]*?<p[\s\S]*?>([\s\S]*?)<\/p>
+        let pattern = /<li[\s\S]*?>[\s\S]*?<span>(主办单位名称|主办单位性质|网站备案\/许可证号|网站名称|网站首页网址|审核时间)<\/span>[\s\S]*?<p[\s\S]*?>([\s\S]*?)<\/p>/g
+        this.results = [];
+        while(pattern.exec(res)){
+          this.results.push({'name':RegExp.$1 , 'value':RegExp.$2});
+          res = RegExp.rightContext;//将str截断
+          pattern.lastIndex = 0;//重置下次匹配开始的位置
         }
+
+        pattern = /以下信息更新时间：(.*?)</
+        let matches = content.match(pattern);
+        this.results.push({'name': '数据更新时间' , 'value': matches[1]});
       },
 
 
-
-
       //onlinfei
-      onlinfeiApi(domain){
-        // https://api.map.baidu.com/location/ip?ak=Gwb8qTDLXEYRQeeeFoSeBBvtL4CjG0oL&ip=182.85.215.46
-        $.get("https://api.onlinfei.com/icp.php?domain=" + domain,res=>{
-          if (res.status === 0){
-            toast(res.info);
-            return;
-          }
-          this.results = [
-            { name: "域名", value: res.data.domain },
-            { name: "单位名称", value: res.data.unitName },
-            { name: "单位性质", value: res.data.unitProperty },
-            { name: "备案号", value: res.data.icpNumber },
-            { name: "网站名称", value: res.data.websiteName },
-            { name: "网站首页地址", value: res.data.websiteHomePageUrl },
-            { name: "审核时间", value: res.data.auditTime },
-          ];
-        },"JSON")
+      async onlinfeiApi(domain){
+        let res = await this.request("https://api.onlinfei.com/icp.php?domain=" + domain);
+        if (res.status === 0){
+          toast(res.info);
+          return;
+        }
+        this.results = [
+          { name: "域名", value: res.data.domain },
+          { name: "单位名称", value: res.data.unitName },
+          { name: "单位性质", value: res.data.unitProperty },
+          { name: "备案号", value: res.data.icpNumber },
+          { name: "网站名称", value: res.data.websiteName },
+          { name: "网站首页地址", value: res.data.websiteHomePageUrl },
+          { name: "审核时间", value: res.data.auditTime },
+        ];
       }
     },
   }

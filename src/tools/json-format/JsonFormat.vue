@@ -71,6 +71,13 @@
       label: "JSON格式化",
       logo: "https://static.easyicon.net/preview/120/1205621.gif",
       desc: "",
+      cmds:[
+        {
+          "type": "regex",
+          "label": "JSON匹配",
+          "match": "/^{[\\s\\S]*}|\\[[\\s\\S]*\\]$/i"
+        }
+      ]
     },
     data() {
       return {

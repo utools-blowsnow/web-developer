@@ -52,6 +52,33 @@
       label: "代码美化",
       logo: "https://static.easyicon.net/preview/126/1266712.gif",
       desc: "",
+      cmds:[
+        {
+          "type": "regex",
+          "label": "html匹配",
+          "match": "/html|div/i"
+        },
+        {
+          "type": "regex",
+          "label": "js匹配",
+          "match": "/var|let|function|document|window/i"
+        },
+        {
+          "type": "regex",
+          "label": "css匹配",
+          "match": "/\\.[\\s\\S]*{[\\s\\S]*}/i"
+        },
+        {
+          "type": "regex",
+          "label": "xml匹配",
+          "match": "/<\\?xml/i"
+        },
+        {
+          "type": "regex",
+          "label": "sql匹配",
+          "match": "/select|update|delete|replcace\\s*into|create\\s*table/i"
+        }
+      ]
     },
     data() {
       return {
@@ -67,6 +94,24 @@
         this.$emit("callbackReturn");
       },
       setValue(value,type){
+        const {code} = window.plugin_enter ? window.plugin_enter : {code: 'html'}
+        var payload = value;
+        if (code === "CodeFormat") {
+          if (payload.match(/html|div/i)) {
+            type = "HTML";
+          } else if (payload.match(/var|let|function|document|window/i)) {
+            type = "Javascript";
+          } else if (payload.match(/\.[\s\S]*{[\s\S]*}/i)) {
+            type = "CSS";
+          } else if (payload.match(/<\?xml/i)) {
+            type = "XML";
+          } else if (payload.match(/select|update|delete|replcace\s*into|create\s*table/i)) {
+            type = "SQL";
+          } else{
+            type = 'HTML';
+          }
+        }
+
         this.selectedType = type;
         this.sourceContent = value;
         this.format();
