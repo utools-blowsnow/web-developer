@@ -106,7 +106,11 @@
 
         // 微信域名拦截查询
         res = await this.request("https://common.onlinfei.com/api/domainCheck/weiXin?url=" + text);
-        this.results.push({'name': '微信域名拦截' , 'value': res.data.info});
+        if (res.data.status == 0){
+          this.results.push({'name': '微信域名拦截' , 'value': `<a href="javascript:;" title="${res.data.data.title} - ${res.data.data.desc}">${res.data.info}</a>`});
+        }else{
+          this.results.push({'name': '微信域名拦截' , 'value': `${res.data.info}`});
+        }
       },
 
       async chinazApi(domain){

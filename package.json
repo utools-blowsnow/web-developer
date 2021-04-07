@@ -9,6 +9,7 @@
   "dependencies": {
     "axios": "^0.21.0",
     "element-ui": "^2.13.0",
+    "fast-speedtest-api": "^0.3.2",
     "vue": "^2.6.10",
     "vuedraggable": "^2.23.2"
   },
