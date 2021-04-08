@@ -125,7 +125,7 @@ export default {
     // https://ip.sb/api/
     async whoisApi(value) {
       // https://api.ip.sb/geoip
-      this.result('https://www.whois.com/whois/refresh.php?domain=' + value)
+      this.request('https://www.whois.com/whois/refresh.php?domain=' + value)
       let res = await this.request("https://www.whois.com/whois/" + value);
       let pattern = /<pre[\s\S]*?>([\s\S]*?)<\/pre>/
       let matches = res.match(pattern);
